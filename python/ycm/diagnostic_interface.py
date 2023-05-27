@@ -117,10 +117,9 @@ class DiagnosticInterface:
 
 
   def _DiagnosticsCount( self, predicate ):
-    count = 0
-    for diags in self._line_to_diags.values():
-      count += sum( 1 for d in diags if predicate( d ) )
-    return count
+    return sum(
+        sum(1 for d in diags if predicate(d))
+        for diags in self._line_to_diags.values())
 
 
   def _UpdateLocationLists( self, open_on_edit = False ):
@@ -284,12 +283,4 @@ def _IsValidRange( start_line, start_column, end_line, end_column ):
     return False
 
   # End line after start line - valid
-  if start_line < end_line:
-    return True
-
-  # Same line, start colum after end column - invalid
-  if start_column > end_column:
-    return False
-
-  # Same line, start column before or equal to end column - valid
-  return True
+  return True if start_line < end_line else start_column <= end_column
